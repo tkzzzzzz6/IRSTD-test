@@ -12,7 +12,7 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 parser = argparse.ArgumentParser(description="PyTorch BasicIRSTD test")
 parser.add_argument("--model_names", default=['ACM'], nargs='+', 
                     help="model_name: 'ACM', 'ALCNet', 'DNANet', 'ISNet', 'RISTDnet', 'UIUNet', 'U-Net', 'RDIAN', 'ISTDU-Net'")
-parser.add_argument("--dataset_dir", default='../DNAnet/dataset/SIRST3', type=str, help="train_dataset_dir")
+parser.add_argument("--dataset_dir", default='./datasets', type=str, help="dataset root dir or a specific dataset dir")
 parser.add_argument("--dataset_names", default=['NUAA-SIRST', 'NUDT-SIRST', 'IRSTD-1K'], nargs='+', 
                     help="dataset_name: 'NUAA-SIRST', 'NUDT-SIRST', 'IRSTD-1K', 'SIRST3', 'NUDT-SIRST-Sea'")
 parser.add_argument("--img_norm_cfg", default=None, type=dict,
@@ -41,7 +41,9 @@ def eval():
     opt.f.write("PD, FA:\t" + str(results2) + '\n')
 
 if __name__ == '__main__':
-    opt.f = open('./eval_' + (time.ctime()).replace(' ', '_') + '.txt', 'w')
+    timestamp = time.strftime('%Y%m%d_%H%M%S')
+    os.makedirs('./eval', exist_ok=True)
+    opt.f = open('./eval/eval_' + timestamp + '.txt', 'w')
     for model_name in opt.model_names:
         opt.model_name = model_name
         print(opt.model_name)

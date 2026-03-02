@@ -14,7 +14,9 @@ global opt
 opt = parser.parse_args()
 
 if __name__ == '__main__':
-    opt.f = open('./params_' + (time.ctime()).replace(' ', '_') + '.txt', 'w')
+    os.makedirs('./cal_params', exist_ok=True)
+    timestamp = time.strftime('%Y%m%d_%H%M%S')
+    opt.f = open('./cal_params/params_' + timestamp + '.txt', 'w')
     input_img = torch.rand(1,1,256,256).cuda()
     for model_name in opt.model_names:
         net = Net(model_name, mode='test').cuda()    

@@ -109,7 +109,18 @@ class InferenceSetLoader(Dataset):
 class EvalSetLoader(Dataset):
     def __init__(self, dataset_dir, mask_pred_dir, test_dataset_name, model_name):
         super(EvalSetLoader).__init__()
-        self.dataset_dir = dataset_dir
+        # Support both dataset root dir and single dataset dir.
+        # 1) dataset_dir/img_idx/test_xxx.txt
+        # 2) dataset_dir/<dataset_name>/img_idx/test_xxx.txt
+        direct_idx = os.path.join(dataset_dir, 'img_idx', 'test_' + test_dataset_name + '.txt')
+        nested_dataset_dir = os.path.join(dataset_dir, test_dataset_name)
+        nested_idx = os.path.join(nested_dataset_dir, 'img_idx', 'test_' + test_dataset_name + '.txt')
+        if os.path.exists(direct_idx):
+            self.dataset_dir = dataset_dir
+        elif os.path.exists(nested_idx):
+            self.dataset_dir = nested_dataset_dir
+        else:
+            self.dataset_dir = dataset_dir
         self.mask_pred_dir = mask_pred_dir
         self.test_dataset_name = test_dataset_name
         self.model_name = model_name
