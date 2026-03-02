@@ -7,6 +7,17 @@ from torchvision.utils import make_grid
 
 global global_step
 global_step = 0
+conv_writer = None
+
+
+def set_conv_writer(writer):
+    global conv_writer
+    conv_writer = writer
+
+
+def _add_image_if_writer(tag, image, step):
+    if conv_writer is not None:
+        conv_writer.add_image(tag, image, global_step=step)
 
 
 class FENetwFW(nn.Module):
@@ -30,10 +41,11 @@ class FENetwFW(nn.Module):
 
         feature_maps = torch.cat(feature_maps, dim=1)  # 对各个卷积核卷积的结果进行融合
 
-        conv_writer.add_image('固定权值卷积',
-                              make_grid(torch.unsqueeze(feature_maps[0], dim=0).transpose(0, 1), normalize=True,
-                                        nrow=3),
-                              global_step=global_step)
+        _add_image_if_writer(
+            '固定权值卷积',
+            make_grid(torch.unsqueeze(feature_maps[0], dim=0).transpose(0, 1), normalize=True, nrow=3),
+            global_step
+        )
         return feature_maps
 
 
@@ -56,25 +68,35 @@ class FENetwVW(nn.Module):
         global global_step
 
         c1 = self.c1(fw_out)
-        conv_writer.add_image('c1',
-                              make_grid(torch.unsqueeze(c1[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
-                              global_step=global_step)
+        _add_image_if_writer(
+            'c1',
+            make_grid(torch.unsqueeze(c1[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
+            global_step
+        )
         c2 = self.c2(c1)
-        conv_writer.add_image('c2',
-                              make_grid(torch.unsqueeze(c2[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
-                              global_step=global_step)
+        _add_image_if_writer(
+            'c2',
+            make_grid(torch.unsqueeze(c2[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
+            global_step
+        )
         c3 = self.c3(c2)
-        conv_writer.add_image('c3',
-                              make_grid(torch.unsqueeze(c3[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
-                              global_step=global_step)
+        _add_image_if_writer(
+            'c3',
+            make_grid(torch.unsqueeze(c3[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
+            global_step
+        )
         FC_subnet = self.FCsubnet(c3)
-        conv_writer.add_image('特征级联子网络',
-                              make_grid(torch.unsqueeze(FC_subnet[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
-                              global_step=global_step)
+        _add_image_if_writer(
+            '特征级联子网络',
+            make_grid(torch.unsqueeze(FC_subnet[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
+            global_step
+        )
         c5 = self.c5(FC_subnet)
-        conv_writer.add_image('c5',
-                              make_grid(torch.unsqueeze(c5[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
-                              global_step=global_step)
+        _add_image_if_writer(
+            'c5',
+            make_grid(torch.unsqueeze(c5[0], dim=0).transpose(0, 1), normalize=True, nrow=4),
+            global_step
+        )
 
         global_step += 1
         return c5

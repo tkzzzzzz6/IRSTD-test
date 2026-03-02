@@ -32,8 +32,9 @@ python train.py --model_names ACM ALCNet --dataset_names IRSTD-1K NUAA-SIRST NUD
   --batchSize 32 --threads 8 --nEpochs 300 --intervals 20
 
 # 完整模型对标：添加更多 SOTA 模型
-python train.py --model_names ACM ALCNet DNANet UIUNet RDIAN ISTDU-Net RISTDnet U-Net --dataset_names IRSTD-1K NUAA-SIRST NUDT-SIRST --batchSize 32 --threads 8 --nEpochs 10 --intervals 20
+python train.py --model_names ACM ALCNet DNANet UIUNet RDIAN ISTDU-Net RISTDnet U-Net --dataset_names IRSTD-1K NUAA-SIRST NUDT-SIRST --batchSize 32 --threads 8 --nEpochs 10 --intervals 1
 
+python train.py --model_names  --dataset_names IRSTD-1K NUAA-SIRST NUDT-SIRST --batchSize 32 --threads 8 --nEpochs 10 --intervals 1
 # 原始配置（保留参考）
 # python train.py --model_names ACM ALCNet --dataset_names IRSTD-1K NUAA-SIRST NUDT-SIRST
 

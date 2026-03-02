@@ -22,7 +22,7 @@ class REBNCONV(nn.Module):
 
 def _upsample_like(src,tar):
 
-    src = F.upsample(src, size=tar.shape[2:], mode='bilinear')
+    src = F.interpolate(src, size=tar.shape[2:], mode='bilinear')
 
     return src
 
