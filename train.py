@@ -7,6 +7,7 @@ from dataset import *
 import matplotlib.pyplot as plt
 from metrics import *
 import numpy as np
+from tqdm.auto import tqdm
 import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 
@@ -94,7 +95,13 @@ def train():
     optimizer, scheduler = get_optimizer(net, opt.optimizer_name, opt.scheduler_name, opt.optimizer_settings, opt.scheduler_settings)
     
     for idx_epoch in range(epoch_state, opt.nEpochs):
-        for idx_iter, (img, gt_mask) in enumerate(train_loader):
+        epoch_pbar = tqdm(
+            train_loader,
+            desc=f"Train {opt.model_name} {opt.dataset_name} [{idx_epoch + 1}/{opt.nEpochs}]",
+            dynamic_ncols=True,
+            leave=False,
+        )
+        for idx_iter, (img, gt_mask) in enumerate(epoch_pbar):
             img, gt_mask = Variable(img).cuda(), Variable(gt_mask).cuda()
             if img.shape[0] == 1:
                 continue
@@ -105,6 +112,7 @@ def train():
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            epoch_pbar.set_postfix(loss=f"{loss.item():.4f}", lr=f"{optimizer.param_groups[0]['lr']:.2e}")
 
         scheduler.step()
         if (idx_epoch + 1) % opt.intervals == 0:
@@ -145,7 +153,13 @@ def test(save_pth):
     eval_mIoU = mIoU() 
     eval_PD_FA = PD_FA()
     with torch.no_grad():
-        for idx_iter, (img, gt_mask, size, _) in enumerate(test_loader):
+        eval_pbar = tqdm(
+            test_loader,
+            desc=f"Eval {opt.model_name} {opt.dataset_name}",
+            dynamic_ncols=True,
+            leave=False,
+        )
+        for idx_iter, (img, gt_mask, size, _) in enumerate(eval_pbar):
             img = Variable(img).cuda()
             pred = net.forward(img)
             pred = pred[:,:,:size[0],:size[1]]

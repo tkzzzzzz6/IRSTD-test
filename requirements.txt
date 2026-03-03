@@ -10,6 +10,7 @@ pytest==7.4.4
 nvitop>=1.3.0
 thop
 nvitop
+tqdm
 
 # Optional: for ISNet (requires DCNv2 compilation separately)
 # scipy>=1.5.0
