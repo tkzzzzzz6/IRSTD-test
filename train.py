@@ -49,6 +49,13 @@ if opt.img_norm_cfg_mean != None and opt.img_norm_cfg_std != None:
 
 seed_pytorch(opt.seed)
 
+def format_seconds(seconds):
+    seconds = int(seconds)
+    h = seconds // 3600
+    m = (seconds % 3600) // 60
+    s = seconds % 60
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
 def train():
     train_set = TrainSetLoader(dataset_dir=opt.dataset_dir, dataset_name=opt.dataset_name, patch_size=opt.patchSize, img_norm_cfg=opt.img_norm_cfg)
     train_loader = DataLoader(dataset=train_set, num_workers=opt.threads, batch_size=opt.batchSize, shuffle=True)
@@ -93,8 +100,11 @@ def train():
 
     net = torch.nn.DataParallel(net)
     optimizer, scheduler = get_optimizer(net, opt.optimizer_name, opt.scheduler_name, opt.optimizer_settings, opt.scheduler_settings)
+    train_start_time = time.time()
+    epoch_time_list = []
     
     for idx_epoch in range(epoch_state, opt.nEpochs):
+        epoch_start_time = time.time()
         epoch_pbar = tqdm(
             train_loader,
             desc=f"Train {opt.model_name} {opt.dataset_name} [{idx_epoch + 1}/{opt.nEpochs}]",
@@ -115,6 +125,7 @@ def train():
             epoch_pbar.set_postfix(loss=f"{loss.item():.4f}", lr=f"{optimizer.param_groups[0]['lr']:.2e}")
 
         scheduler.step()
+        epoch_time_list.append(time.time() - epoch_start_time)
         if (idx_epoch + 1) % opt.intervals == 0:
             total_loss_list.append(float(np.array(total_loss_epoch).mean()))
             print(time.ctime()[4:-5] + ' Epoch---%d, total_loss---%f,' 
@@ -140,6 +151,16 @@ def train():
                 'total_loss': total_loss_list,
                 }, save_pth)
             test(save_pth)
+
+    total_train_time = time.time() - train_start_time
+    avg_epoch_time = total_train_time / max(1, len(epoch_time_list))
+    train_time_msg = (
+        f"Training Time ({opt.model_name}/{opt.dataset_name}) -> "
+        f"total: {format_seconds(total_train_time)} ({total_train_time:.2f}s), "
+        f"avg/epoch: {format_seconds(avg_epoch_time)} ({avg_epoch_time:.2f}s)"
+    )
+    print(train_time_msg)
+    opt.f.write(train_time_msg + '\n')
 
 def test(save_pth):
     test_set = TestSetLoader(opt.dataset_dir, opt.dataset_name, opt.dataset_name, img_norm_cfg=opt.img_norm_cfg)
