@@ -12,3 +12,7 @@ thop
 
 # Optional: for ISNet (requires DCNv2 compilation separately)
 # scipy>=1.5.0
+
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# python -c "import torch; print(torch.__version__); print(torch.version.cuda); print(torch.cuda.is_available())"
