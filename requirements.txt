@@ -9,6 +9,14 @@ scikit-image==0.23.2
 pytest==7.4.4
 nvitop>=1.3.0
 thop
+nvitop
+tqdm
 
 # Optional: for ISNet (requires DCNv2 compilation separately)
 # scipy>=1.5.0
+
+# conda create -n irstd python=3.10
+# conda activate irstd
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# python -c "import torch; print(torch.__version__); print(torch.version.cuda); print(torch.cuda.is_available())"

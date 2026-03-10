@@ -3,6 +3,7 @@
 # python train.py --model_names ACM ALCNet --dataset_names SIRST-v1
 
 python train.py --model_names ACM ALCNet  --dataset_names IRSTD-1K NUAA-SIRST NUDT-SIRST
+python train.py --model_names ACM ALCNet  --dataset_names IRSTD-1K NUAA-SIRST NUDT-SIRST --batchSize 128 --threads 8 --nEpochs 300 --intervals 20
 
 # test
 # python test.py --model_names ACM ALCNet --dataset_names SIRST-v1
